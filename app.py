@@ -111,7 +111,7 @@ if __name__=="__main__":
 
  @app.get("/") 
 async def root():
-return {"message": "Hello from Snyk Hunter Team"}
+return {"message": "Hello from the otterside"}
 
 # Get Location of Temporary folder in the file system
 # If the file system is not one of: Windows,Linux or Darwin, show an error
