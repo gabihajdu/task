@@ -60,6 +60,44 @@ def compute(a,b,c):
     return result1, result2
 
 @app.route("/")
+async def root():
+    return {"Hello from the otterside"}
+
+def get_tmp_path():
+	system = platform.system() 
+	if system == "Windows":
+		return "C:\\Temp\\unpack" 
+	elif system == "Linux":
+		return "/tmp/unpack/" 
+	elif system == "Darwin":
+		return "/tmp/unpack/" 
+	else:
+		raise NotImplementedError(f"Unsupported system: {system}") @app.route("/")
+        
+def process_file(filename):
+	with tempfile.NamedTemporaryFile(delete=True) as tmpfile:
+		tmpfile.write(filename.read())
+		tmpfile.seek(0)
+		with tarfile.open(tmpfile.name, "r:gz") as untar:
+			untar.extractall(path=get_tmp_path()) 
+		untar.close()		
+
+@app.route("/hello/{name}")
+async def hello_name(name: str):
+	escaped_name = safe.escape(name)
+	return {"message": f"Hello, {escaped_name}!"}
+
+@app.route("/upload")
+async def upload_file(file: UploadFile = File(...)):
+	ext = file.filename.split(".")[-1]	
+
+	if ext.lower() != "gz":
+		return {"filename": file.filename, "message": "File must be a Tar GZ file"} 
+	else:
+		process_file(file.file)
+		return {"filename": file.filename, "message": "File uploaded and processed"}
+    
+@app.route("/")
 def primef(n):
     pc = 0
     n = int(n)
